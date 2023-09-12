@@ -47,6 +47,6 @@ I am using bootstrap and react js here. So if you got stuck anywhere, please loo
 
 ##### clone our respository
 
-##### npm install
+##### yarn install
 
-##### npm start
+##### yarn run start
