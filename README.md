@@ -1,4 +1,4 @@
-# React Bootstrap admin starter template
+# React App For University Management Portal - Assignment Module
 
 ## screenshots
 
@@ -50,5 +50,3 @@ I am using bootstrap and react js here. So if you got stuck anywhere, please loo
 ##### npm install
 
 ##### npm start
-
-And you can start making an awesome admin application now.

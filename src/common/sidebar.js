@@ -1,43 +1,61 @@
 import React from "react";
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import PerfectScrollbar from 'react-perfect-scrollbar'
-import { Link } from 'react-router-dom';
+import "react-perfect-scrollbar/dist/css/styles.css";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import { Link } from "react-router-dom";
 
 class Sidebar extends React.Component {
-    constructor(props){
-        super(props)
+  constructor(props) {
+    super(props);
 
-        this.state = {}
-    }
+    this.state = {};
+  }
 
-    render(){
-        return <div className="border-end sidenav" id="sidebar-wrapper">
-            <div className="sidebar-heading border-bottom ">
-                <Link to="/">
-                    <img alt="Alt content" src={require('./../assets/images/logo.png')} />
-                </Link>
-            </div>
-            <PerfectScrollbar className="sidebar-items">
-                <ul className="list-unstyled ps-0">
-                    <li className="mb-1">
-                        <Link tag="a" className="" to="/">
-                            <i className="fa fa-dashboard"></i> Dashboard
-                        </Link>
-                    </li>
-                    <li className="mb-1">
-                        <Link tag="a" className="" to="/blank-page">
-                            <i className="fa fa-file-o"></i> Blank Page
-                        </Link>
-                    </li>
-                    <li className="border-top my-3"></li>
-                    <li className="mb-1">
-                        <Link tag="a" className="" to="/typography">
-                        <i className="fa fa-text-width" aria-hidden="true"></i> Typography
-                        </Link>
-                    </li>
-                    
-                    {/* collapsable list item example */}
-                    {/* <li className="mb-1">
+  logout(){
+    localStorage.removeItem("token");
+    localStorage.removeItem("userDetail");
+
+    // Remove/Update Below Code:
+    window.location.href = "/";
+  }
+
+  render() {
+
+    const userDetail = localStorage.getItem('userDetail');
+    const userDetailParsed = JSON.parse(userDetail);
+    const username = userDetailParsed.name;
+
+    return (
+      <div className="border-end sidenav" id="sidebar-wrapper">
+        <div className="sidebar-heading border-bottom ">
+          <Link to="/dashboard">
+            <img
+              alt="Alt content"
+              src={require("./../assets/images/logo.png")}
+            />
+          </Link>
+        </div>
+        <PerfectScrollbar className="sidebar-items">
+          <ul className="list-unstyled ps-0">
+            <li className="mb-1">
+              <Link tag="a" className="" to="/dashboard">
+                <i className="fa fa-dashboard"></i> Dashboard
+              </Link>
+            </li>
+            <li className="mb-1">
+              <Link tag="a" className="" to="/assignments">
+                <i className="fa fa-file-o"></i> Assignments
+              </Link>
+            </li>
+            <li className="border-top my-3"></li>
+            <li className="mb-1">
+              <Link tag="a" className="" to="/typography">
+                <i className="fa fa-text-width" aria-hidden="true"></i>{" "}
+                Typography
+              </Link>
+            </li>
+
+            {/* collapsable list item example */}
+            {/* <li className="mb-1">
                         <button className="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
                         Opportunity
                         </button>
@@ -51,22 +69,48 @@ class Sidebar extends React.Component {
                         </div>
                     </li> 
                     <li className="border-top my-3"></li> */}
-                   
-                </ul>
-            </PerfectScrollbar>
-            <div className="dropdown fixed-bottom-dropdown">
-                <a href="#" className="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://via.placeholder.com/50" alt="" width="32" height="32" className="rounded-circle me-2" />
-                    <span>Tarun Dhiman</span>
-                </a>
-                <ul className="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-                    <li><Link className="dropdown-item" to="/profile"><i className="fa fa-user-circle" aria-hidden="true"></i> Profile</Link></li>
-                    <li><hr className="dropdown-divider" /></li>
-                    <li><Link className="dropdown-item" to="/login"><i className="fa fa-sign-out" aria-hidden="true"></i> Sign out</Link></li>
-                </ul>
-            </div>
+          </ul>
+        </PerfectScrollbar>
+        <div className="dropdown fixed-bottom-dropdown">
+          <a
+            href="#"
+            className="d-flex align-items-center text-decoration-none dropdown-toggle"
+            id="dropdownUser2"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <img
+              src="https://via.placeholder.com/50"
+              alt=""
+              width="32"
+              height="32"
+              className="rounded-circle me-2"
+            />
+            <span>{username}</span>
+          </a>
+          <ul
+            className="dropdown-menu text-small shadow"
+            aria-labelledby="dropdownUser2"
+          >
+            {/* <li>
+              <Link className="dropdown-item" to="/profile">
+                <i className="fa fa-user-circle" aria-hidden="true"></i> Profile
+              </Link>
+            </li>
+            <li>
+              <hr className="dropdown-divider" />
+            </li> */}
+            <li>
+                <button className="dropdown-item" onClick={this.logout}> <i className="fa fa-sign-out" aria-hidden="true"></i> Sign out</button>
+              {/* <Link className="dropdown-item" to="/">
+                <i className="fa fa-sign-out" aria-hidden="true"></i> Sign out
+              </Link> */}
+            </li>
+          </ul>
         </div>
-    }
+      </div>
+    );
+  }
 }
 
 export default Sidebar;

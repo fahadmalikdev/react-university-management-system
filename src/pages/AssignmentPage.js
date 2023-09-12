@@ -1,7 +1,7 @@
 import React from "react";
 import adminLayout from "../hoc/adminLayout";
 
-class AdminBlankPage extends React.Component {
+class AssignmentPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -11,10 +11,10 @@ class AdminBlankPage extends React.Component {
   render() {
     return (
       <>
-        <p>Content here..</p>
+        <p>Assignment page content here..</p>
       </>
     );
   }
 }
 
-export default adminLayout(AdminBlankPage);
+export default adminLayout(AssignmentPage);
