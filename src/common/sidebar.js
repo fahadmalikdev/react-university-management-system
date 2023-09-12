@@ -47,12 +47,12 @@ class Sidebar extends React.Component {
               </Link>
             </li>
             <li className="border-top my-3"></li>
-            <li className="mb-1">
+            {/* <li className="mb-1">
               <Link tag="a" className="" to="/typography">
                 <i className="fa fa-text-width" aria-hidden="true"></i>{" "}
                 Typography
               </Link>
-            </li>
+            </li> */}
 
             {/* collapsable list item example */}
             {/* <li className="mb-1">
