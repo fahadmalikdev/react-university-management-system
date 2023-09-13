@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const defaultBaseURL = 'https://136d-103-8-115-242.ngrok-free.app';
+const defaultBaseURL = 'http://localhost:1337';
 const backendBaseURL = process.env.BACKEND_BASE_URL || defaultBaseURL;
 
 const httpService = axios.create({

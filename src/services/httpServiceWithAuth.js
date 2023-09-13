@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const defaultBaseURL = "https://136d-103-8-115-242.ngrok-free.app";
+const defaultBaseURL = "http://localhost:1337";
 const backendBaseURL = process.env.BACKEND_BASE_URL || defaultBaseURL;
 
 const getToken = () => {
@@ -42,7 +42,21 @@ export const get = async (url, config = {}) => {
 
 export const post = async (url, data, config = {}) => {
   try {
-    const response = await httpServiceWithAuth.get(url, data, config);
+    const response = await httpServiceWithAuth.post(url, data, config);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/";
+    }
+    throw error.response.data;
+  }
+};
+
+export const put = async (url, data, config = {}) => {
+  try {
+    const response = await httpServiceWithAuth.put(url, data, config);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 401) {
