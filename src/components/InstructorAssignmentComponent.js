@@ -1,5 +1,5 @@
 import React from "react";
-import { get, put } from "../services/httpServiceWithAuth";
+import { get, post, put } from "../services/httpServiceWithAuth";
 
 class InstructorAssignmentComponent extends React.Component {
   constructor(props) {
@@ -8,11 +8,14 @@ class InstructorAssignmentComponent extends React.Component {
       assignments: [],
       loading: true,
       isModalOpen: false,
+      isModalOpenCreate: false,
       isModalOpenSubmission: false,
       selectedAssignmentId: null,
       assignmentName: "",
       assignmentDescription: "",
-      assignmentSubmissionArray: []
+      assignmentDueDate: "",
+      assignmentSubmissionArray: [],
+      currentDate: '',
     };
   }
 
@@ -81,6 +84,22 @@ class InstructorAssignmentComponent extends React.Component {
     return formattedDate;
   }
 
+  formatDateToYYYYMMDD(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  }
+
+  isEditDisabled(dueDate, currentDate) {
+    const differenceInDays = Math.floor(
+      (new Date(dueDate) - currentDate) / (1000 * 60 * 60 * 24)
+    );
+    return differenceInDays < 4;
+  }
+
   openModalViewSubmission = (assignmentId, assignmentName, assignmentDescription) => {
     this.fetchAssignmentSubmissions(assignmentId);
     this.setState({ isModalOpenSubmission: true, selectedAssignmentId: assignmentId, assignmentName: assignmentName, assignmentDescription: assignmentDescription });
@@ -91,15 +110,24 @@ class InstructorAssignmentComponent extends React.Component {
     this.setState({ isModalOpen: true, selectedAssignmentId: assignmentId });
   }
 
+  openModalCreate = () => {
+    const currentTimestamp = Date.now();
+    const formattedDate = this.formatDateToYYYYMMDD(currentTimestamp);
+    this.setState({ isModalOpenCreate: true, currentDate: formattedDate })
+  }
+
   closeModal = () => {
-      this.setState({ 
-        isModalOpen: false, 
-        isModalOpenSubmission: false, 
-        assignmentName: "", 
-        assignmentDescription: "",
-        selectedAssignmentId: null,
-        assignmentSubmissionArray: []
-      });
+    this.setState({ 
+      isModalOpen: false, 
+      isModalOpenSubmission: false,
+      isModalOpenCreate: false,
+      assignmentName: "", 
+      assignmentDescription: "",
+      assignmentDueDate: "",
+      selectedAssignmentId: null,
+      assignmentSubmissionArray: [],
+      currentDate: ''
+    });
     this.fetchAssignments();
   }
 
@@ -111,10 +139,24 @@ class InstructorAssignmentComponent extends React.Component {
     this.setState({ assignmentDescription: e.target.value });
   };
 
+  handleInputChangeDueDate = (e) => {
+    this.setState({ assignmentDueDate: e.target.value });
+  };
+
   handleSubmitEdit = async () => {
     const { selectedAssignmentId, assignmentName, assignmentDescription } = this.state;
     try {
       await put(`/api/v1/assignment/update?id=${selectedAssignmentId}`, { name: assignmentName, description: assignmentDescription });
+      this.closeModal();
+    } catch (error) {
+      console.error("Error submitting assignment:", error);
+    }
+  };
+
+  handleSubmitCreate = async () => {
+    const { assignmentName, assignmentDescription, assignmentDueDate } = this.state;
+    try {
+      await post(`/api/v1/assignment/create`, { name: assignmentName, description: assignmentDescription, due_date: assignmentDueDate });
       this.closeModal();
     } catch (error) {
       console.error("Error submitting assignment:", error);
@@ -128,7 +170,7 @@ class InstructorAssignmentComponent extends React.Component {
   }
 
   render() {
-    const { assignments, loading, isModalOpen, isModalOpenSubmission, assignmentName, assignmentDescription, assignmentSubmissionArray } = this.state;
+    const { assignments, loading, isModalOpen, isModalOpenCreate, isModalOpenSubmission, assignmentName, assignmentDescription, assignmentDueDate, assignmentSubmissionArray, currentDate } = this.state;
 
     return (
       <>
@@ -137,7 +179,14 @@ class InstructorAssignmentComponent extends React.Component {
             <div className="col">
               <h5 className="pb-2 mb-0">Assignments</h5>
             </div>
-            <div className="col text-right"></div>
+            <div className="col text-right">
+              <button 
+                className="btn btn-primary low-height-btn"
+                onClick={()=>{this.openModalCreate()}}
+              >
+                <i className="fa fa-plus"></i> Create Assignment
+              </button>
+            </div>
           </div>
           {loading ? (
             <p>Loading assignments...</p>
@@ -177,6 +226,7 @@ class InstructorAssignmentComponent extends React.Component {
                             className="dropdown-menu"
                             aria-labelledby="dropdownMenuButtonSM"
                           >
+                            {!this.isEditDisabled(assignment.due_date, Date.now()) && (
                             <li>
                               <button 
                                 className="dropdown-item" 
@@ -187,6 +237,7 @@ class InstructorAssignmentComponent extends React.Component {
                                 &nbsp;Edit
                               </button>
                             </li>
+                            )}
                             <li>
                               <button 
                                 className="dropdown-item" 
@@ -208,6 +259,91 @@ class InstructorAssignmentComponent extends React.Component {
           ) : (
             <p>Nothing to display</p>
           )}
+        </div>
+
+
+        <div
+          className={`modal ${isModalOpenCreate ? "show" : ""}`}
+          tabIndex="-1"
+          role="dialog"
+          style={{ display: isModalOpenCreate ? "block" : "none" }}
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              {/* Modal header */}
+              <div className="modal-header">
+                <h5 className="modal-title">Create Assignment</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                  onClick={this.closeModal}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              {/* Modal body */}
+              <div className="modal-body">
+                {/* Add your modal content here */}
+                {/* Example: */}
+                <div className="form-group">
+                  <label htmlFor="assignmentName">Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="assignmentName"
+                    value={assignmentName}
+                    onChange={this.handleInputChangeName}
+                  />
+                </div>
+                <br></br>
+                <div className="form-group">
+                  <label htmlFor="assignmentDescription">Description</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="assignmentDescription"
+                    value={assignmentDescription}
+                    onChange={this.handleInputChangeDescription}
+                  />
+                </div>
+                <br></br>
+                <div className="form-group">
+                  <label htmlFor="assignmentDueDate">Due Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="assignmentDueDate"
+                    value={assignmentDueDate}
+                    min={currentDate}
+                    onChange={this.handleInputChangeDueDate}
+                  />
+                </div>
+                <br></br>
+              </div>
+
+              {/* Modal footer */}
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-dismiss="modal"
+                  onClick={this.closeModal}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={this.handleSubmitCreate}
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
 
@@ -258,6 +394,7 @@ class InstructorAssignmentComponent extends React.Component {
                     onChange={this.handleInputChangeDescription}
                   />
                 </div>
+                <br></br>
               </div>
 
               {/* Modal footer */}
