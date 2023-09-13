@@ -1,4 +1,6 @@
 import React from "react";
+import InstructorAssignmentComponent from "../components/InstructorAssignmentComponent";
+import StudentAssignmentComponent from "../components/StudentAssignmentComponent";
 import adminLayout from "../hoc/adminLayout";
 
 class AssignmentPage extends React.Component {
@@ -8,10 +10,34 @@ class AssignmentPage extends React.Component {
     this.state = {};
   }
 
-  render() {
+  studentComponent() {
     return (
       <>
-        <p>Assignment page content here..</p>
+        <StudentAssignmentComponent />
+      </>
+    );
+  }
+
+  instructorComponent() {
+    return (
+      <>
+        <InstructorAssignmentComponent />
+      </>
+    );
+  }
+
+  render() {
+
+    const userDetail = localStorage.getItem('userDetail');
+    const userDetailParsed = JSON.parse(userDetail);
+
+    let component;
+    if (userDetailParsed.role === 'student') component = this.studentComponent();
+    else component = this.instructorComponent();
+
+    return (
+      <>
+        <div>{component}</div>
       </>
     );
   }

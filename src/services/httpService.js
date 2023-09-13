@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const defaultBaseURL = 'https://ecec-103-8-115-242.ngrok-free.app';
+const defaultBaseURL = 'https://136d-103-8-115-242.ngrok-free.app';
 const backendBaseURL = process.env.BACKEND_BASE_URL || defaultBaseURL;
 
 const httpService = axios.create({
